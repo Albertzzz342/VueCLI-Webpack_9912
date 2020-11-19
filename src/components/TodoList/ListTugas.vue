@@ -55,8 +55,27 @@
             label="Note"
             required
         ></v-textarea>
+
+        <template v-slot:[`item.checkboxes`]="{ item }">
+            <v-checkbox v-model="deleteChecked" :value="item"></v-checkbox>
+        </template>
+
       </v-data-table>
     </v-card>
+
+    <span v-if="deleteChecked.length!=0">
+        <v-card align="justify" class="my-5">
+            <div class="container">
+                Delete Multiple :
+                <ul v-for="(item,index) in deleteChecked" :key="index">
+                    <li>{{ item.task }}</li>
+                </ul>
+                <v-btn color="red black--text" @click="multipleDelete">
+                    HAPUS SEMUA
+                </v-btn>
+            </div>
+        </v-card>
+    </span>
 
 
     <v-dialog v-model="dialog" persistent max-width="600px">
@@ -192,6 +211,7 @@ export default {
       dialogSaveDelete: false,
       todosSelesai: [],
       itemContent: [],
+      deleteChecked: [],
       headers: [
         {
           text: "Task",
@@ -202,6 +222,7 @@ export default {
         { text: "Priority", value: "priority" },
         { text: "Note", value: "note" },
         { text: "Actions", value: "actions" },
+        { text: "Multiple Delete", value: "checkboxes" },
       ],
       headersSelesai: [
         {
@@ -295,6 +316,16 @@ export default {
       if (priority == "Penting") return "red";
       else if (priority == "Tidak penting") return "green";
       else if (priority == "Biasa") return "blue";
+    },
+    multipleDelete()
+    {
+        for(this.i = 0; this.i < this.deleteChecked.length; this.i++)
+        {
+            this.index = this.todos.indexOf(this.deleteChecked[this.i]);
+            this.todosSelesai.push(this.todos[this.index]);
+            this.todos.splice(this.index, 1);
+        }
+        this.deleteChecked = [];
     },
   },
 };
